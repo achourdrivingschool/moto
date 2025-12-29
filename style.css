@@ -404,24 +404,26 @@ h1, h2, h3{
 }
 
 .landing-location{
+  display: flex;
+  justify-content: center;   /* 🔥 center horizontally */
   margin-top: 6px;
-  font-size: 15px;
-  font-weight: 700;
-  color: rgba(255,255,255,.85);
 }
 
 .landing-location a{
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+
+  flex-direction: row-reverse; /* pin on the RIGHT */
+  color: rgba(255,255,255,.85);
+  text-decoration: none;
 }
 
 .loc-emoji{
-  opacity: .85;
+  font-size: 20px;
   line-height: 1;
+  color: #ffffff;
 }
-
-
 
 .landing-phone{
   margin-bottom: 2px;
