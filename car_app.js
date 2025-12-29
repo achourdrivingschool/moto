@@ -1,17 +1,17 @@
-// app.js — Random 30 questions + confirm answer + end results review (Arabic UI)
+// car_app.js — Random 30 questions + confirm answer + end results review (Arabic UI)
 
 let QUESTIONS = [];
 let quiz = {
   list: [],
   index: 0,
   score: 0,
-  selected: null,   // selected index (original index in q.choices)
-  locked: false,    // becomes true only AFTER confirm
-  answers: [],      // { id, chosenIndex, correctIndex }
+  selected: null,
+  locked: false,
+  answers: [],
   _lastNextAt: 0
 };
 
-const TAKE_COUNT = 30; // always random 30 questions
+const TAKE_COUNT = 30;
 
 function shuffle(arr) {
   const a = [...arr];
@@ -23,10 +23,8 @@ function shuffle(arr) {
 }
 
 async function loadQuestions() {
-  const VERSION = "20251228-1";
-const res = await fetch(`questions.json?v=${VERSION}`, { cache: "no-store" });
-
-  if (!res.ok) throw new Error("Could not load questions.json");
+  const res = await fetch("car_questions.json", { cache: "no-store" });
+  if (!res.ok) throw new Error("Could not load car_questions.json");
   return await res.json();
 }
 
@@ -34,19 +32,15 @@ function setButtonEnabled(btn, enabled) {
   if (!btn) return;
   btn.disabled = !enabled;
   btn.setAttribute("aria-disabled", String(!enabled));
-  btn.style.pointerEvents = enabled ? "auto" : "none"; // HARD block taps on mobile
+  btn.style.pointerEvents = enabled ? "auto" : "none";
 }
 
 function bindTap(el, handler) {
   if (!el) return;
 
   const wrapped = (e) => {
-    // If it's disabled, ignore (extra safety for mobile weirdness)
     if (el.disabled) return;
-
-    // prevent ghost tap / scroll tap
     if (e && typeof e.preventDefault === "function") e.preventDefault();
-
     handler(e);
   };
 
@@ -85,25 +79,20 @@ function renderQuestion() {
   const qTextEl = document.getElementById("qText");
   const qImgEl = document.getElementById("qImg");
 
-  // Reset state
   quiz.selected = null;
   quiz.locked = false;
 
   const confirmBtn = document.getElementById("confirmBtn");
   const nextBtn = document.getElementById("nextBtn");
-
-  // Confirm/Next must be OFF until selection + confirm
   setButtonEnabled(confirmBtn, false);
   setButtonEnabled(nextBtn, false);
 
-  // Hide feedback completely
   const fb = document.getElementById("feedback");
   if (fb) {
     fb.className = "feedback hidden";
     fb.textContent = "";
   }
 
-  // Question image/text handling (NO ?? for Android)
   const hasImg = q && q.image && String(q.image).trim() !== "";
   if (hasImg) {
     qImgEl.src = q.image;
@@ -125,7 +114,6 @@ function renderQuestion() {
     qTextEl.classList.remove("hidden");
   }
 
-  // Render choices
   const box = document.getElementById("choices");
   box.innerHTML = "";
 
@@ -136,20 +124,17 @@ function renderQuestion() {
     btn.className = "choice";
     btn.type = "button";
     btn.innerHTML = `<span>${text}</span>`;
-    btn.dataset.index = String(idx); // original index
+    btn.dataset.index = String(idx);
 
     bindTap(btn, () => {
       if (quiz.locked) return;
 
-      // remove previous selection
       [...box.querySelectorAll(".choice")].forEach((b) =>
         b.classList.remove("selected")
       );
 
       btn.classList.add("selected");
       quiz.selected = idx;
-
-      // allow confirm after picking an answer
       setButtonEnabled(confirmBtn, true);
     });
 
@@ -171,17 +156,14 @@ function revealAnswer() {
 
   const correct = q.correctIndex;
 
-  // Save answer
   quiz.answers[quiz.index] = { id: q.id, chosenIndex: chosen, correctIndex: correct };
 
-  // If correctIndex missing, just unlock next (no colors)
   if (typeof correct !== "number") {
     setButtonEnabled(document.getElementById("nextBtn"), true);
     setButtonEnabled(document.getElementById("confirmBtn"), false);
     return;
   }
 
-  // Mark correct / wrong + lock choices
   buttons.forEach((btn) => {
     const idx = Number(btn.dataset.index);
     if (idx === correct) btn.classList.add("correct");
@@ -191,16 +173,13 @@ function revealAnswer() {
 
   if (chosen === correct) quiz.score += 1;
 
-  // Enable next, disable confirm
   setButtonEnabled(document.getElementById("nextBtn"), true);
   setButtonEnabled(document.getElementById("confirmBtn"), false);
 }
 
 function nextQuestion() {
-  // ✅ Hard guard: you cannot go next unless you confirmed
   if (!quiz.locked) return;
 
-  // ✅ Anti double-tap
   const now = Date.now();
   if (now - quiz._lastNextAt < 250) return;
   quiz._lastNextAt = now;
