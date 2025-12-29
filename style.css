@@ -410,6 +410,13 @@ h1, h2, h3{
   color: rgba(255,255,255,.85);
 }
 
+/* location icon like phone */
+.landing-location::before{
+  content: "📍 ";
+  opacity: .85;
+}
+
+
 .landing-phone{
   margin-bottom: 2px;
 }
