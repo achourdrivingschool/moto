@@ -410,11 +410,17 @@ h1, h2, h3{
   color: rgba(255,255,255,.85);
 }
 
-/* location icon like phone */
-.landing-location::before{
-  content: "📍 ";
-  opacity: .85;
+.landing-location a{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
+
+.loc-emoji{
+  opacity: .85;
+  line-height: 1;
+}
+
 
 
 .landing-phone{
@@ -465,7 +471,7 @@ h1, h2, h3{
 /* SAME button style */
 .landing-btn{
   padding: 14px 44px;     /* ⬅ smaller than before */
-  font-size: 18px;        /* ⬅ smaller text */
+  font-size: 16px;        /* ⬅ smaller text */
   font-weight: 800;
 
   border-radius: 999px;
